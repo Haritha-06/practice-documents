@@ -1,0 +1,48 @@
+Hypervisor					Container
+
+* Need to install complete OS			* No need of complete OS
+* Memory consuming				* Not memory consuming
+* Virtual Server but real OS			* Virtual Server duplicate OS
+ex: AWS ec2,Virtual Box etc..			ex: Dockers, lex-dee
+* Can enjoy all the services 			*Can have limited OS services.
+provided by the OS		
+
+*Docker Hub:- where we can find the images for creating the containers.
+
+docker commands:-
+
+* To install docker:
+	yum install docker -y
+* To check docker version:
+	docker --version
+* To check whether docker is running or not:
+	systemctl status docker
+* If docker's status is inactive:
+	systemctl start docker
+* To check container's status inside docker:
+	docker ps
+* To check images 
+	docker images
+*To pull an image from docker hub
+	docker pull centos
+* To create a container using the image:
+	docker run -it -d centos
+	(here -it means running in interactive mode and -d means run it in background).
+* To stop a container:
+	docker stop containerID
+* To display both running and non-running containers:
+	docker ps-a
+* To restart the stopped container:
+	docker start containerID
+* To remove a container:
+	docker rm containerID
+* To remove an image
+	docker rmi imagename
+* To give name to the container while creation:
+	docker run--name KUMAR -it -d centos
+* To get inside a container:
+	docker exec -it ContainerID bash(connect using bash shell)
+* To exit from container:
+	exit
+
+ 

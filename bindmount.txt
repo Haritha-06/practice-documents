@@ -1,0 +1,14 @@
+--------bindmount----------- 
+
+yum install  docker
+systemctl start docker
+docker pull ngnix
+mkdir /tmp/ngnix/html
+ docker run -it -d -P -v /tmp/ngnix/html:/usr/share/nginx/html --name nginxcontainer nginx:latest
+run container: docker exec -it conatinerid bash
+
+to check binding or not: docker inspect containerid 
+
+----
+ docker run -it --name test_mount --mount type=bind,source=$(pwd),target=/myapp debian
+docker run -it --name test_volume -v /tmp/dir1:/myapp debian

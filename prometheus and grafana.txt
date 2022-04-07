@@ -1,0 +1,121 @@
+
+prometheus:
+--> free and open source tool. 
+-->promethus is a software application used for event monitoring and alterting.
+--> it records real-time metrics in a time series database built using http pull model.
+
+continuous monitoring in prometheus:
+
+--> monitoring application and application servers is important part of days devops culture and process.
+--> now via continuous monitoring obviously monitoring applictions and servers for applications exception , memory usage, server cpu and storage spikes.
+
+prometheus metrics and its types:
+
+--> counters
+--> histogram
+--> gauges
+-->summery
+
+
+installation :
+
+---premetheus.io-->download --> copy link
+
+  1  wget https://github.com/prometheus/prometheus/releases/download/v2.33.4/prometheus-2.33.4.linux-amd64.tar.gz
+    2  ls
+    3  tar -xvf
+    4  tar -xvf prometheus-2.33.4.linux-amd64.tar.gz
+    5  ls
+    6  cd prometheus-2.33.4.linux-amd64
+    7  ls
+    8  ./prometheus
+    9  sudo cp -r .  /usr/local/bin/prometheus
+   10  vi /etc/systemd/system/prometheus.service
+  --------------------------------------------------
+[Unit]
+Description=Prometheus Service
+After=netwotk.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/prometheus/prometheus --config.file=/usr/local/bin/prometheus/prometheus.yml
+
+[Install]
+WantedBy=multi-user.target
+-----------------------------------------
+   
+    
+   13  vi /etc/systemd/system/prometheus.service
+   14  sudo systemctl daemon-reload
+   15  sudo systemctl start prometheus
+   16  sudo systemctl status prometheus
+
+
+access browser: http://localhost:9090
+---------------------------
+ install node exporter (Node Exporter is a Prometheus exporter for server level and OS level metrics with configurable metric collectors. 
+It helps us in measuring various server resources such as RAM, disk space, and CPU utilization)
+-----------------------
+ wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+  133  ls
+  134  tar -xvf node_exporter-1.3.1.linux-amd64.tar.gz
+  135  ls
+  136  cd node_exporter-1.3.1.linux-amd64
+  137  ls
+  138  sudo cp node_exporter /usr/local/bin
+  139  ls /usr/local/bin
+  140  vi /etc/systemd/system/node-exporter.service
+------------------------------------------
+
+[Unit]
+Description=Prometheus node Exporter Service
+After=netwotk.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+
+--------------------------------------------- 
+ 141  sudo systemctl daemon-reload
+  142  systemctl start node-exporter
+  143  systemctl status  node-exporter
+
+
+access through web browser : http://13.235.17.189:9100
+
+
+  cd /usr/local/bin
+   cd prometheus
+   vi prometheus.yml
+
+  - job_name: "node_exporter"
+    static_configs:
+      - targets: ["localhost:9100"]
+
+
+ sudo systemctl restart prometheus
+------------------------------------------------------
+install graphana
+--------------------
+
+  175  wget https://dl.grafana.com/enterprise/release/grafana-enterprise-8.4.1-1.x86_64.rpm
+  176  sudo yum install grafana-enterprise-8.4.1-1.x86_64.rpm
+  181  systemctl start grafana-server
+  182  systemctl status grafana-server
+
+acess browser : 3000 port 
+
+
+
+
+grafana: Grafana is a multi-platform open source analytics and interactive visualization web application.
+         It provides charts, graphs, and alerts for the web when connected to supported data sources.
+
+
+
+
+
+

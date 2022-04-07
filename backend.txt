@@ -1,0 +1,21 @@
+----backend project-----
+
+1.create instance
+2.installl docker - yum install docker -y
+3.systemctl start docker
+4.write docker file-
+
+
+FROM centos:latest
+RUN yum install java-11-devel -y && yum install maven -y && yum install git -y
+RUN mkdir /petclinic
+WORKDIR /petclinic
+RUN git clone https://github.com/VIKAS1203/spring-petclinic.git .
+RUN mvn package -DskipTests
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/petclinic/target/spring-petclinic-2.5.0-SNAPSHOT.jar"]
+
+
+5.port mapping : docker run -it -p 8080:8080 -d imagename
+
+6.access through webbrowser

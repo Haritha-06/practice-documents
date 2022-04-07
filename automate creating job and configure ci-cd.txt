@@ -1,0 +1,63 @@
+    
+  groovy script: automate creating the job and configured the ci-cd pipe-line  
+
+
+       steps :
+     
+      1. created new pipeline job  
+      2. add the below groovy script
+
+  ------  - - --------------------------------------------------------     
+import hudson.plugins.git.*;
+
+def scm = new GitSCM("https://github.com/Haritha-06/ci-cd-groovy-script.git")
+scm.branches = [new BranchSpec("*/master")];
+
+def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile.txt")
+
+def parent = Jenkins.instance
+def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(parent, "NewJob")
+def spec = "*/30 * * * *";
+hudson.triggers.TimerTrigger newCron = new hudson.triggers.TimerTrigger(spec);
+newCron.start(job, true);
+job.addTrigger(newCron);
+job.save();
+job.definition = flowDefinition
+
+parent.reload()
+
+
+-------------------------------------------------------------
+
+3. build the pipelinejob. (this pipeline job will create new job and configured ci-cd).
+
+
+
+4.ci-cd groovy script:(github repo) 
+
+
+--------------------------------------------------------------
+   pipeline {
+       agent any
+              stages {
+                   stage('Clone') {
+                         steps {
+                            git credentialsId: 'Github', url: 'https://github.com/skillrary/welcometoskillrary.git'
+                            }
+                         }
+                   stage('Build') {
+                            steps {
+                                sh "mvn clean install"   
+                            }
+                         }
+		      stage('Deploy to Tomcat'){
+			      steps{
+                               sh "cp /var/lib/jenkins/workspace/NewJob/webapp/target/webapp.war /usr/share/apache-tomcat-9.0.58/webapps"
+
+				    }
+		            }
+                      
+		      
+	          }
+     }
+-----------------------------------------------------------------------------------

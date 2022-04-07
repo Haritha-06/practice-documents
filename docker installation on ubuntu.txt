@@ -1,0 +1,11 @@
+install docker on ubuntu
+
+1. Install Docker
+--sudo curl -fsSL get.docker.com | /bin/bash
+
+2. add jenkins user to docker group
+--usermod -aG docker jenkins
+
+3. restart jenkins
+
+--systemctl restart jenkins

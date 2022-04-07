@@ -1,0 +1,83 @@
+	Ansible Install and config in Redhat linux
+
+For amazon linux (sudo amazon-linux-extras install ansible2)
+
+management Server side:
+* Install epel repo to download pre-requisite packages
+	eg:"sudo wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+
+* "sudo yum install epel-release-latest-8.noarch.rpm" :-To install repository
+
+* "sudo yum install <git> <python2> <python2-devel> <python2-pip> <openssl>  <ansible2>"
+
+* "ansible --version"
+
+* Inside ansible package /etc/ansible
+
+* sudo vi /etc/ansible/hosts 
+
+* vi hosts :- Adding nodes to server(can add anywhere in b/w)
+	eg: [<name of the group of servers>]
+		<private IP of the node1>
+		<private IP of the node2>
+		<private IP of the noden>
+
+* sudo vi /etc/ansible/hosts 
+
+* vi ansible.cfg :- To make ansible server to recognize node
+	Uncomment[i.e., remove "#"] from inventory
+	Uncomment sudo_user = root
+
+* create user and password in both server and hosts
+	"adduser <uname>"
+	"passwd <pswd>"
+
+* cd /etc/visudo :- To enable root privilages for newly created user(edit this file from logging as a root user in both server and host)
+		under allow root to run any command anywhere, add the following
+	eg:- <uname created>  ALL=(ALL)  NOPASSWD: ALL
+
+* As a root user edit "sudo vi /etc/ssh/sshd_config" in both server & hosts
+	-uncomment PermitRootLogin
+	-uncomment PasswordAuthentication Yes
+	-Save and Exit, "service sshd restart" or "sudo systemctl restart sshd.service"
+
+* su <uname created> :- Switch to newuser created on server and in hosts also
+
+* "ssh <PrivateIP/PublicIP>" :- establishing connection to nodes from server
+
+	Establishing Trust Relationship
+* goto management server
+
+* It should be established between  same username
+
+* Login with username created
+
+* "ssh-keygen" (Don't give password for key generation)
+
+* "ssh-copy-id <uname created>@<node1PrivateIP>" (It will paste the key directly inside node .ssh directory from server .ssh directory)
+	- ls -a(to view hidden files)
+	- .ssh path :- /home/<username directory>/.ssh
+
+* "ansible all --list-hosts" :- Run after exiting from node. It lists all the hosts connected to ansible server
+
+
+
+
+
+Hosts/node side:
+* Nothing to install on server side
+
+* create user and password in both server and hosts
+	adduser <uname>
+	passwd <pswd>
+
+* As a root user edit "sudo vi /etc/ssh/sshd_config" in both server & hosts
+	-uncomment PermitRootLogin
+	-uncomment PasswordAuthentication Yes
+	-Save and Exit, "service sshd restart" or "sudo systemctl restart sshd.service"
+
+* cd /etc/visudo :- To enable root privilages for newly created user(edit this file from logging as a root user in both server and host)
+		under allow root to run any command anywhere, add the following
+	eg:- <uname created>  ALL=(ALL)  NOPASSWD: ALL
+
+* su <uname created> :- Switch to newuser created on server and in hosts also

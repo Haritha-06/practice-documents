@@ -1,0 +1,183 @@
+
+
+
+    automate ci-cd pipeline:(jfrog,docker,tomcat)
+
+
+    steps :
+     
+      1. created new pipeline job  
+      2. add the below groovy script
+
+  ------  - - --------------------------------------------------------     
+import hudson.plugins.git.*;
+
+def scm = new GitSCM("https://github.com/Haritha-06/ci-cd-groovy-script.git")
+scm.branches = [new BranchSpec("*/master")];
+
+def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "jenkinsfile1.txt")
+
+def parent = Jenkins.instance
+def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(parent, "NewJob")
+def spec = "*/30 * * * *";
+hudson.triggers.TimerTrigger newCron = new hudson.triggers.TimerTrigger(spec);
+newCron.start(job, true);
+job.addTrigger(newCron);
+job.save();
+job.definition = flowDefinition
+
+parent.reload()
+
+
+3. build the pipelinejob. (this pipeline job will create new job and configured ci-cd).
+
+
+4.ci-cd groovy script:(github repo(jenkinsfile1.txt)) 
+
+
+--------------------------------------------------------------
+
+ pipeline {
+       agent any
+              stages {
+                   stage('Clone') {
+                         steps {
+                            git credentialsId: 'Github', url: 'https://github.com/skillrary/welcometoskillrary.git'
+                            }
+                         }
+                   stage('Build') {
+                            steps {
+                                sh "mvn clean install"   
+                            }
+                         }
+		     stage ('Server'){
+            steps {
+               rtServer (
+                 id: "jfroglocal",
+                 url: 'http://13.232.241.230:8082/artifactory',
+                 username: 'admin',
+                  password: 'Haritha@406',
+                  bypassProxy: true,
+                   timeout: 300
+                        )
+            }
+        }
+        stage('Upload'){
+            steps{
+                rtUpload (
+                 serverId:"jfroglocal" ,
+                  spec: '''{
+                   "files": [
+                      {
+                      "pattern": "*.war",
+                      "target": "logic-ops-lab-libs-snapshot-local"
+                      }
+                            ]
+                           }''',
+                        )
+            }
+
+
+
+
+
+        }
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "jfroglocal"
+                )
+            }
+        }
+		      
+	          }
+     }
+
+
+
+-----------------------------------------------------
+5.  download artifact from jfrog in to slave node of jenkins and dockerizing that artifact and push to docker hub and deploy that war file to tomcat.
+
+5.1.  create one pipeline job and run that job on slave server
+5.2.   add the below groovy script
+
+-----------------------------------------------------------------
+
+pipeline {
+       agent {label 'slave1'}
+              stages {
+                   stage ('Server'){
+                    steps {
+                        
+               rtServer (
+                 id: "jfroglocal",
+                 url: 'http://13.232.241.230:8082/artifactory',
+                 username: 'admin',
+                  password: 'Haritha@406',
+                  bypassProxy: true,
+                   timeout: 300
+                        )
+            } 
+                   }
+                  stage('download'){
+            steps{
+                rtDownload (
+    serverId: 'jfroglocal',
+    spec: '''{
+          "files": [
+            {
+              "pattern": "*.war",
+              "target": "logic-ops-lab-libs-release/"
+
+            }
+          ]
+    }''',
+ 
+    
+    buildName: 'artifactnewjob',
+    buildNumber: '1',
+   
+)
+}
+}
+    stage('scm checkout'){
+        steps{
+            git credentialsId: 'efb1442e-0e51-4f39-b97f-f98b076649b1', url: 'https://github.com/Haritha-06/ci-cd-groovy-script.git'
+        }
+    }
+     stage('Docker Build') {
+      
+      steps {
+         
+        sh 'sudo docker build -t myapp .'
+        sh 'sudo docker run -itd -p 8081:8081 --name my_application_container myapp'
+      }
+    }
+    stage('Docker Push') {
+     
+      steps {
+      withCredentials([string(credentialsId: 'docker-pwd1', variable: 'dockerhub')]) {
+          sh "sudo docker login -u haritha406 -p Haritha@123"
+          sh 'sudo docker tag myapp haritha406/myapp'
+          sh 'sudo docker push haritha406/myapp'
+        }
+      }
+    }
+    stage('deploy'){
+        steps{
+            deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://65.2.140.177:8080')], contextPath: null, war: '**/*.war'
+        }
+    }
+    
+}
+}
+
+
+-----------------------------------------------------------------
+dockerfile 
+
+
+FROM tomcat
+COPY logic-ops-lab-libs-release/webapp.war /usr/local/tomcat/webapps/
+
+  

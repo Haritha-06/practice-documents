@@ -1,0 +1,45 @@
+----front end project----
+
+
+1.create instance
+2.install docker: yum install docker -y
+                  systemctl start docker
+3.install git
+4.install node:  sudo yum install -y gcc-c++ make
+                 curl -sL https://rpm.nodesource.com/setup_16.x | sudo -E bash -
+                 yum install nodejs -y
+
+
+4.git clone https://github.com/Juriy/easyio.git .
+5.write dockerfile(vi Dockerfile)
+
+FROM node:16
+WORKDIR /server
+COPY package.json .
+RUN npm install
+COPY . .
+EXPOSE 8080
+CMD npm start
+
+6.docker build -t imagename path
+
+7.docker run -it -p 8080:8080 imagename
+
+
+dockerfile
+
+
+FROM centos:latest
+WORKDIR /new
+RUN yum install git -y && yum install -y gcc-c++ make && curl -sL https://rpm.nodesource.com/setup_16.x &&  yum install nodejs -y
+RUN git clone  https://github.com/Juriy/easyio.git .
+RUN npm install -y
+COPY . .
+EXPOSE 8080
+CMD npm start
+
+
+in ubuntu node js install
+
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install nodejs

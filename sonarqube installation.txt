@@ -1,0 +1,77 @@
+install sonarqube in linux:
+
+
+1. install java: amazon-linux-extras install java-openjdk11
+2. login as root: sysctl vm.max_map_count
+                  sysctl fs.file-max
+                  ulimit -n
+                  ulimit -u
+
+3.  If you're running on Linux, you must ensure that:
+
+vm.max_map_count is greater than or equal to 524288
+fs.file-max is greater than or equal to 131072
+the user running SonarQube can open at least 131072 file descriptors
+the user running SonarQube can open at least 8192 threads
+
+4. set dynamically : sysctl -w vm.max_map_count=524288
+                     sysctl -w fs.file-max=131072
+                     ulimit -n 131072
+                     ulimit -u 8192 
+5. download sonarqube: cd /opt 
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.6.zip
+
+6.sudo unzip sonarqube-7.6.zip
+7.sudo mv sonarqube-7.6 sonarqube
+8.sudo useradd sonar
+7.passwd
+8.give root privalages to that user
+9.sudo su - sonar
+8.cd /opt/sonarqube/bin/linux-x86-64 
+9../sonar.sh start
+10.sudo ./sonar.sh status
+
+
+
+
+ref : https://devopscube.com/setup-and-configure-sonarqube-on-linux/
+       https://docs.sonarqube.org/latest/requirements/requirements/
+      https://techviewleo.com/install-postgresql-12-on-amazon-linux/
+
+
+
+
+
+
+
+
+postsql:
+
+step1: add postsql repo
+  
+1. sudo  amazon-linux-extras | grep postgre 
+2. sudo tee /etc/yum.repos.d/pgdg.repo<<EOF
+ [pgdg12]
+ name=PostgreSQL 12 for RHEL/CentOS 7 - x86_64
+ baseurl=https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-7-x86_64
+ enabled=1
+ gpgcheck=0
+ EOF 
+3. sudo yum makecache
+
+step2: install postsql repo
+
+1.sudo yum install postgresql12 postgresql12-server
+
+step3: initialize database
+
+1. sudo /usr/pgsql-12/bin/postgresql-12-setup initdb
+
+step4: 
+1.  sudo systemctl enable --now postgresql-12
+2. systemctl status postgresql-12
+
+
+        
+
+
